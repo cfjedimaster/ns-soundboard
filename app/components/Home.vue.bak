@@ -1,0 +1,95 @@
+<template>
+    <Page class="page">
+        <ActionBar class="action-bar">
+            <Label class="action-bar-title" text="Home"></Label>
+        </ActionBar>
+
+        <StackLayout>
+            <Button text="Record" @tap="doRecord" />
+            <Button text="Test Play" @tap="doPlay" />
+        </StackLayout>
+    </Page>
+</template>
+
+<script>
+const audio = require('nativescript-audio');
+const fileSystemModule = require('tns-core-modules/file-system');
+const audioFolder = fileSystemModule.knownFolders.currentApp().getFolder('recordings');
+const platform = require('tns-core-modules/platform');
+
+export default {
+    methods:{
+        async doRecord() {
+            console.log('doRecord Called 1e');
+            let recorder = new audio.TNSRecorder();
+
+            /*
+            from the sample app
+            */
+            let androidFormat;
+            let androidEncoder;
+            if (platform.isAndroid) {
+                // m4a
+                // static constants are not available, using raw values here
+                // androidFormat = android.media.MediaRecorder.OutputFormat.MPEG_4;
+                androidFormat = 2;
+                // androidEncoder = android.media.MediaRecorder.AudioEncoder.AAC;
+                androidEncoder = 3;
+            }
+
+            let options = {
+                filename:audioFolder.path+'/recording.mp4',
+                format:androidFormat,
+                encoder:androidEncoder,
+                infoCallback:info => {
+                    //apparently I'm necessary even if blank
+                },
+                errorCallback:e => {
+                    console.log('error cb',e);
+                }
+            };
+
+            await recorder.start(options);
+            console.log('in theory recording');
+            setTimeout(() => {
+                console.log('calling stop');
+                recorder.stop()
+                .then(() => {
+                    console.log('really done');
+                })
+                .catch(e => {
+                    console.log('error stopping', e);
+                });
+            }, 3000);
+        },
+        doPlay() {
+            console.log('does the file exist? ', fileSystemModule.File.exists(audioFolder.path+'/recording.mp4'));
+            let player = new audio.TNSPlayer();
+            player.playFromFile({
+                audioFile:audioFolder.path+'/recording.mp4'
+            })
+            .then(() => {
+                console.log('in then');
+            })
+            .catch(e => {
+                console.log('in error', e);
+            });
+        }
+    }
+};
+</script>
+
+<style scoped lang="scss">
+    // Start custom common variables
+    @import '../app-variables';
+    // End custom common variables
+
+    // Custom styles
+    .fa {
+        color: $accent-dark;
+    }
+
+    .info {
+        font-size: 20;
+    }
+</style>
