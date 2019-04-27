@@ -19,12 +19,6 @@
 </template>
 
 <script>
-/*
-So there's a bit of disjunction between this.lastName and the Play button. Right now Play 
-is activated the second you hit record, it should wait until you hit stop, but I need to
-store it globally so I can use it so... yeah I'm confused. Oh, I could make it based on lastName and not recording
-*/
-
 const audio = require('nativescript-audio');
 const platform = require('tns-core-modules/platform');
 const fileSystemModule = require('tns-core-modules/file-system');
@@ -103,8 +97,6 @@ export default {
 				}
 			};
 
-			console.log('confirming ok', options);
-
             await this.recorder.start(options);
 			this.recording = true;
 
@@ -127,7 +119,6 @@ export default {
 
         },
 		save() {
-			console.log('here goes nothing');
 			sounds.saveSound(this.name, this.lastName);
             this.$navigateTo(Home);
 		}
