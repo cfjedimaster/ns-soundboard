@@ -1,7 +1,7 @@
 <template>
     <Page class="page">
         <ActionBar class="action-bar">
-            <Label class="action-bar-title" text="Home"></Label>
+            <Label class="action-bar-title" text="Custom Sound Board"></Label>
         </ActionBar>
 
         <StackLayout>
@@ -38,13 +38,11 @@ export default {
     },
     methods:{
         goToRecord() {
-            console.log('go record2');
             this.$navigateTo(Record);
         },
 
         async playSound(event) {
             console.log('play sound tapped', event.item);
-			console.log('doPlay called');
             let player = new audio.TNSPlayer();
 
             await player.playFromFile({
@@ -60,4 +58,12 @@ export default {
     // Start custom common variables
     @import '../app-variables';
     // End custom common variables
+
+    StackLayout {
+        padding: 10px;
+    }
+
+    Label {
+        padding: 20px;
+    }
 </style>
