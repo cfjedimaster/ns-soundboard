@@ -8,9 +8,9 @@
 
             <Label v-if="sounds.length === 0" text="You haven't recorded any sounds yet." />
 
-            <ListView for="sound in sounds" @itemTap="playSound" @longPress="deleteSound">
+            <ListView for="sound in sounds" @itemTap="playSound">
                 <v-template>
-                    <Label :text="sound.name" />
+                    <Label :text="sound.name" :filename="sound.fileName" @longPress="deleteSound" />
                 </v-template>
             </ListView>
             <Button text="Record New Sounds" @tap="goToRecord" />
@@ -38,19 +38,21 @@ export default {
     },
     methods:{
         async deleteSound(event) {
+            let filename = event.object.filename;
             let confirmOptions = {
                 title: "Delete Sound",
                 message: "Do you want to delete this sound?",
                 okButtonText: "Yes",
                 cancelButtonText: "No"
             };
-            confirm(confirmOptions).then(result => {
+            confirm(confirmOptions).then(async result => {
                 if(result) {
                     // first delete the file
-                    let file = this.audioFolder.getFile(event.item.fileName);
+                    let file = this.audioFolder.getFile(filename);
                     console.log('going to try to delete', file);
                     await file.remove();
-                    soundsAPI.removeSound(event.item.fileName);
+                    soundsAPI.removeSound(filename);
+                    this.sounds = soundsAPI.getSounds();
                 }
             });
         },
@@ -58,7 +60,7 @@ export default {
             this.$navigateTo(Record);
         },
         async playSound(event) {
-            console.log('play sound tapped', event.item);
+            console.log('play sound tapped', event.item.fileName);
             let player = new audio.TNSPlayer();
 
             await player.playFromFile({
