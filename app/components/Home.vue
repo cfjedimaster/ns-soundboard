@@ -8,7 +8,7 @@
 
             <Label v-if="sounds.length === 0" text="You haven't recorded any sounds yet." />
 
-            <ListView for="sound in sounds" @itemTap="playSound">
+            <ListView for="sound in sounds" @itemTap="playSound" @longPress="deleteSound">
                 <v-template>
                     <Label :text="sound.name" />
                 </v-template>
@@ -37,10 +37,26 @@ export default {
 		this.audioFolder = fileSystemModule.knownFolders.currentApp().getFolder('recordings');
     },
     methods:{
+        async deleteSound(event) {
+            let confirmOptions = {
+                title: "Delete Sound",
+                message: "Do you want to delete this sound?",
+                okButtonText: "Yes",
+                cancelButtonText: "No"
+            };
+            confirm(confirmOptions).then(result => {
+                if(result) {
+                    // first delete the file
+                    let file = this.audioFolder.getFile(event.item.fileName);
+                    console.log('going to try to delete', file);
+                    await file.remove();
+                    soundsAPI.removeSound(event.item.fileName);
+                }
+            });
+        },
         goToRecord() {
             this.$navigateTo(Record);
         },
-
         async playSound(event) {
             console.log('play sound tapped', event.item);
             let player = new audio.TNSPlayer();

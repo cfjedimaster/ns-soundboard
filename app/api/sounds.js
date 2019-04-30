@@ -8,19 +8,24 @@ const sounds = {
 		if(json === '') return [];
 		else return JSON.parse(json);
 	},
+	removeSound(fileName) {
+		let sounds = this.getSounds();
+		sounds = sounds.filter(s => {
+			return s.fileName != fileName;
+		});
+		//serialize it
+		let json = JSON.stringify(sounds);	
+		appSettings.setString('sounds', json);
+	},
 	saveSound(name, fileName) {
 		let sounds = this.getSounds();
 		sounds.push({
 			name:name,
 			fileName:fileName
 		});
-		//persist the bitch	
 		//serialize it
-		console.log('will this work?');
 		let json = JSON.stringify(sounds);	
-		console.log('my json brngs all the boys to the yard', json);
 		appSettings.setString('sounds', json);
-		console.log('i did it');
 	}
 }
 
